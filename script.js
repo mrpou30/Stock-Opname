@@ -33,6 +33,11 @@ const APP_SCRIPT_UPLOAD_URL = "https://script.google.com/macros/s/AKfycbwGu2q_nU
 //====Helper Function======
 //=========================
 
+//deteksi perangkat ios
+function isIOS() {
+  return /iPhone|iPad|iPod/i.test(navigator.userAgent);
+}
+
 //use info
 async function openUserInfoModal() {
   if (!db) await initDB();
@@ -1506,6 +1511,44 @@ async function uploadOpnameToServer() {
 //=====Core Function=======
 //=========================
 
+//Kamera Ios
+async function scanWithZXingIOS() {
+  const preview = document.getElementById("scanner");
+  scannerBox.style.display = "block";
+
+  // pastikan area bersih
+  preview.innerHTML = "";
+  preview.style.height = "300px";
+  preview.style.width = "100%";
+
+  const reader = new ZXingBrowser.BrowserMultiFormatReader();
+
+  try {
+    // ambil daftar kamera
+    const devices = await ZXingBrowser.BrowserCodeReader.listVideoInputDevices();
+    if (!devices.length) {
+      showAlert("error", "Kamera tidak ditemukan.");
+      return;
+    }
+
+    // kamera belakang = device terakhir biasanya
+    const backCam = devices[devices.length - 1].deviceId;
+
+    const result = await reader.decodeOnceFromVideoDevice(backCam, preview);
+
+    // hasil scan
+    playBeep();
+    document.getElementById("input-upc").value = result.text;
+    scannerBox.style.display = "none";
+    lookupItem(result.text.trim());
+
+    reader.reset();
+  } catch (err) {
+    console.error("ZXing iOS Error:", err);
+    showAlert("error", "Gagal membaca barcode di iOS.");
+  }
+}
+
 //initial indexDB
 async function initDB() {
   return new Promise((resolve, reject) => {
@@ -1878,7 +1921,19 @@ const btnScan = document.getElementById("btn-scan");
 const btnCloseScan = document.getElementById("btn-close-scan");
 const btnHistory = document.getElementById("btn-history");
 const btnValidasi = document.getElementById("btn-validasi");
+const btnScanIOS = document.getElementById("btn-scan-ios");
 
+//Kamera ios
+if (btnScanIOS) {
+  btnScanIOS.addEventListener("click", () => {
+    if (!isIOS()) {
+      showAlert("info", "Tombol ini hanya untuk perangkat iOS.");
+      return;
+    }
+
+    scanWithZXingIOS();
+  });
+}
 
 //input upc enter
 if (inputUPC) {
