@@ -1980,7 +1980,7 @@ if (btnScan) {
   scannerBox.style.display = "block";
   html5QrCode = new Html5Qrcode("scanner");
   const config = {
-  fps: 10,
+  fps: 25,
   qrbox: { width: 320, height: 320 }, // iOS butuh area lebih besar
   aspectRatio: 1.0,                   // wajib, bantu fokus iOS
   formatsToSupport: [ 
