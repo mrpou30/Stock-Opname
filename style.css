@@ -237,4 +237,4 @@ button:active {
 .alert-box.error { border-left: 6px solid #e74c3c; color: #e74c3c; }
 .alert-box.info { border-left: 6px solid #2980b9; color: #2980b9; }
 
-.device { font-size: 2px; }
+.device { font-size: 10px; }
